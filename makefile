@@ -32,4 +32,8 @@ install:
 	&& php artisan migrate \
 	&& php artisan db:seed \
 	&& npm install \
+	&& npm run build \
+	&& cd nova-components/AttachBelongsToMany \
+	&& composer install \
+	&& npm install \
 	&& npm run build
