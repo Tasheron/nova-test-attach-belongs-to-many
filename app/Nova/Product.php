@@ -8,6 +8,8 @@ use Laravel\Nova\Fields\ID;
 use Laravel\Nova\Fields\Number;
 use Laravel\Nova\Fields\Text;
 use Laravel\Nova\Http\Requests\NovaRequest;
+use Laravel\Nova\Panel;
+use Tasheron\AttachBelongsToMany\AttachBelongsToMany;
 
 class Product extends Resource
 {
@@ -62,6 +64,13 @@ class Product extends Resource
                 ->min(0)
                 ->step(1)
                 ->required(),
+
+            Panel::make('Attach categories', [
+                AttachBelongsToMany::make('Categories')
+                    ->apiResourceNames('product', 'category')
+                    ->attachResourceName('categories')
+                    ->onlyOnForms(),
+            ]),
         ];
     }
 

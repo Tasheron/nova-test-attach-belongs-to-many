@@ -3,11 +3,17 @@
     "type": "module",
     "scripts": {
         "dev": "vite",
-        "build": "vite build"
+        "build": "vite build",
+        "watch": "vite build --watch",
+        "build-attach-belongs-to-many": "cd nova-components/AttachBelongsToMany && npm run dev",
+        "build-attach-belongs-to-many-prod": "cd nova-components/AttachBelongsToMany && npm run prod"
     },
     "devDependencies": {
         "axios": "^1.7.4",
         "laravel-vite-plugin": "^1.0",
         "vite": "^5.0"
+    },
+    "dependencies": {
+        "vuex": "^4.1.0"
     }
 }

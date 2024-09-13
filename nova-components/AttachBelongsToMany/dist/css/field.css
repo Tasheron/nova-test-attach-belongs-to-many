@@ -1,0 +1,9 @@
+/* Nova Field CSS */
+.rounded-r {
+    border-top-right-radius: 0.25rem;
+    border-bottom-right-radius: 0.25rem;
+}
+
+.cursor-move {
+    cursor: move;
+}

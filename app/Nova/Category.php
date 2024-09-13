@@ -6,6 +6,8 @@ use Laravel\Nova\Fields\HasMany;
 use Laravel\Nova\Fields\ID;
 use Laravel\Nova\Fields\Text;
 use Laravel\Nova\Http\Requests\NovaRequest;
+use Laravel\Nova\Panel;
+use Tasheron\AttachBelongsToMany\AttachBelongsToMany;
 
 class Category extends Resource
 {
@@ -46,6 +48,13 @@ class Category extends Resource
             Text::make('Name')
                 ->maxlength(255)
                 ->required(),
+
+            Panel::make('Attach products', [
+                AttachBelongsToMany::make('Products')
+                    ->apiResourceNames('category', 'product')
+                    ->attachResourceName('products')
+                    ->onlyOnForms(),
+            ]),
         ];
     }
 
