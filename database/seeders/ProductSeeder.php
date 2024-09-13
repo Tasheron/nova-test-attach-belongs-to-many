@@ -16,7 +16,11 @@ class ProductSeeder extends Seeder
         Product::factory(50)
             ->create()
             ->each(function (Product $product) {
-                $product->categories()->saveMany(Category::factory(rand(1, 5))->create())->make();
+                Category::factory(rand(1, 3))
+                    ->create()
+                    ->each(function (Category $category, int $index) use ($product) {
+                        $product->categories()->save($category, ['index' => $index]);
+                    });
             });
     }
 }
