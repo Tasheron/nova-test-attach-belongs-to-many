@@ -68,8 +68,7 @@ class Product extends Resource
             Panel::make('Attach categories', [
                 AttachBelongsToMany::make('Categories')
                     ->apiResourceNames('product', 'category')
-                    ->attachResourceName('categories')
-                    ->onlyOnForms(),
+                    ->attachResourceName('categories'),
             ]),
         ];
     }

@@ -13,6 +13,14 @@ class AttachBelongsToMany extends Field
      */
     public $component = 'attach-belongs-to-many';
 
+    public function __construct($name, $attribute = null, callable $resolveCallback = null)
+    {
+        parent::__construct($name, $attribute, $resolveCallback);
+
+        $this->fillUsing(function () {})
+            ->onlyOnForms();
+    }
+
     public function apiResourceNames(string $resource, string $attachResource)
     {
         return $this->withMeta([
