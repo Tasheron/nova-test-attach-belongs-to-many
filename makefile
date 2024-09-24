@@ -36,4 +36,4 @@ install:
 	&& cd nova-components/AttachBelongsToMany \
 	&& composer install \
 	&& npm install \
-	&& npm run build
+	&& npm run dev
