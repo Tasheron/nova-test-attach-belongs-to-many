@@ -20,18 +20,21 @@ class Category extends Model
 
     public $timestamps = false;
 
-    public function products()
+    public function products(string $sort = 'asc')
     {
-        return $this->belongsToMany(Product::class, 'product_categories')->withPivot('index')->orderByPivot('index');
+        return $this->belongsToMany(Product::class, 'product_categories')->withPivot('index')->orderByPivot('index', $sort);
     }
 
-    public function addProduct($productId)
+    public function addProduct($productId): Product
     {
         if ($this->products->contains($productId)) {
             throw new Exception('Product already attached');
         }
 
         $this->products()->attach($productId, ['index' => $this->products()->count()]);
+        $this->updateIndex();
+
+        return $this->products('desc')->first();
     }
 
     public function removeProduct($productId)
@@ -50,10 +53,28 @@ class Category extends Model
         $productIndex = self::findIndexInArray($products, 'id', $productId);
 
         self::moveElement($products, $productIndex, $newIndex);
+        $this->updateIndex($products);
+    }
 
-        foreach ($products as $index => $product) {
+    private function updateIndex(array $products = null)
+    {
+        foreach ($products ?? $this->products->toArray() as $index => $product) {
             $this->products()->updateExistingPivot($product['id'], ['index' => $index]);
         }
+    }
+
+    public function updatePivot(int $productId, array $newValues): array
+    {
+        if (isset($newValues['index'])) {
+            $this->changeIndex($productId, $newValues['index']);
+            unset($newValues['index']);
+        }
+
+        if ($newValues) {
+            $this->products()->updateExistingPivot($productId, $newValues);
+        }
+
+        return $this->products()->get()->toArray();
     }
 
     public function scopeFilter(Builder $query, ?string $filter, ?int $productId)

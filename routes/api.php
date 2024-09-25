@@ -10,6 +10,7 @@ Route::prefix('product')->group(function() {
     Route::put('/{product}/category/{category}', [ProductController::class, 'attach']);
     Route::delete('/{product}/category/{category}', [ProductController::class, 'detach']);
     Route::post('/{product}/changeIndex/{category}', [ProductController::class, 'changeIndex']);
+    Route::post('/{product}/updatePivot/{category}', [ProductController::class, 'updatePivot']);
 });
 
 Route::prefix('category')->group(function() {
@@ -18,4 +19,5 @@ Route::prefix('category')->group(function() {
     Route::put('/{category}/product/{product}', [CategoryController::class, 'attach']);
     Route::delete('/{category}/product/{product}', [CategoryController::class, 'detach']);
     Route::post('/{category}/changeIndex/{product}', [CategoryController::class, 'changeIndex']);
+    Route::post('/{category}/updatePivot/{product}', [CategoryController::class, 'updatePivot']);
 });

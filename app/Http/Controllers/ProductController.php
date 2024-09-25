@@ -24,7 +24,7 @@ class ProductController extends Controller
 
     public function attach(Product $product, int $categoryId)
     {
-        $product->addCategory($categoryId);
+        return $product->addCategory($categoryId);
     }
 
     public function detach(Product $product, int $categoryId)
@@ -35,5 +35,12 @@ class ProductController extends Controller
     public function changeIndex(Request $request, Product $product, int $categoryId)
     {
         $product->changeIndex($categoryId, $request->index);
+
+        return $product->categories()->get()->toArray();
+    }
+
+    public function updatePivot(Request $request, Product $product, int $categoryId)
+    {
+        return $product->updatePivot($categoryId, $request->newValues);
     }
 }

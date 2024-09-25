@@ -4,6 +4,7 @@ namespace App\Nova;
 
 use Laravel\Nova\Fields\HasMany;
 use Laravel\Nova\Fields\ID;
+use Laravel\Nova\Fields\Number;
 use Laravel\Nova\Fields\Text;
 use Laravel\Nova\Http\Requests\NovaRequest;
 use Laravel\Nova\Panel;
@@ -52,7 +53,11 @@ class Category extends Resource
             Panel::make('Attach products', [
                 AttachBelongsToMany::make('Products')
                     ->apiResourceNames('category', 'product')
-                    ->attachResourceName('products'),
+                    ->setSorting('index')
+                    ->setNameField('name')
+                    ->setPivotFields([
+                        Number::make('index'),
+                    ]),
             ]),
         ];
     }

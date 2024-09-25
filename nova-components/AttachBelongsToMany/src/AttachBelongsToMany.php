@@ -18,7 +18,9 @@ class AttachBelongsToMany extends Field
         parent::__construct($name, $attribute, $resolveCallback);
 
         $this->fillUsing(function () {})
-            ->onlyOnForms();
+            ->onlyOnForms()
+            ->setSorting('index')
+            ->setNameField('name');
     }
 
     public function apiResourceNames(string $resource, string $attachResource)
@@ -29,10 +31,24 @@ class AttachBelongsToMany extends Field
         ]);
     }
 
-    public function attachResourceName(string $resource)
+    public function setPivotFields(array $fields)
     {
         return $this->withMeta([
-            'attachResourceName' => $resource,
+            'pivotFields' => $fields,
+        ]);
+    }
+
+    public function setSorting(string $field)
+    {
+        return $this->withMeta([
+            'sortingField' => $field,
+        ]);
+    }
+
+    public function setNameField(string $field)
+    {
+        return $this->withMeta([
+            'nameField' => $field,
         ]);
     }
 }
