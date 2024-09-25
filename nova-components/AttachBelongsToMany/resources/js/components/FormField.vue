@@ -115,85 +115,54 @@ export default {
     },
 
     findObjects(e) {
-      const $this = this;
       let val = e.target.value;
 
       if (val != '') {
-        $.ajax({
-          url: `/api/${this.field.attachApiResourceName}/find`,
-          method: 'post',
-          data: {
+        this.$http.post(
+          `/api/${this.field.attachApiResourceName}/find`,
+          {
             filter: val,
             resourceId: this.resourceId,
-          },
-          success: function(data) {
-            $this.findList = data;
-          },
-          error: function() {
-            Nova.$toasted.error('Error with searching resource');
-          },
-        });
+          }
+        ).then(response => this.findList = response.data)
+          .catch(() => Nova.$toasted.error('Error with searching resource'));
       } else {
         this.findList = [];
       }
     },
 
     detach(id) {
-      const $this = this;
-
-      $.ajax({
-        url: `/api/${this.field.mainApiResourceName}/${this.resourceId}/${this.field.attachApiResourceName}/${id}`,
-        method: 'delete',
-        success: function() {
-          $this.value = $this.value.filter(el => el.id != id);
-          Nova.$toasted.success('Model detach successfully');
-        },
-        error: function() {
-          Nova.$toasted.error(`Error when detaching resource with id ${id}`);
-        },
-      });
+      this.$http.delete(
+        `/api/${this.field.mainApiResourceName}/${this.resourceId}/${this.field.attachApiResourceName}/${id}`
+      ).then(() => {
+        this.value = this.value.filter(el => el.id != id);
+        Nova.$toasted.success('Model detach successfully');
+      }).catch(() => Nova.$toasted.error(`Error when detaching resource with id ${id}`));
     },
 
     attach(item) {
-      const $this = this;
-
-      $.ajax({
-        url: `/api/${this.field.mainApiResourceName}/${this.resourceId}/${this.field.attachApiResourceName}/${item.id}`,
-        method: 'put',
-        success: function(resource) {
-          $this.findList = [];
-          $this.value.push(resource);
-          $(`#${$this.field.attribute}`).val('');
-          Nova.$toasted.success('Model attach successfully');
-        },
-        error: function(response) {
-          Nova.$toasted.error(`Error when attaching resource with id ${item.id}: ${response.responseJSON.message}`);
-        },
-      });
+      this.$http.put(
+        `/api/${this.field.mainApiResourceName}/${this.resourceId}/${this.field.attachApiResourceName}/${item.id}`
+      ).then(response => {
+        this.findList = [];
+        this.value.push(response.data);
+        this.$el.querySelector(`#${this.field.attribute}`).value = '';
+        Nova.$toasted.success('Model attach successfully');
+      }).catch(error => Nova.$toasted.error(`Error when attaching resource with id ${item.id}: ${error.message}`));
     },
 
     changeIndex(e) {
-      const $this = this;
-
       if (e.oldIndex == e.newIndex) {
         return;
       }
 
-      $.ajax({
-        url: `/api/${this.field.mainApiResourceName}/${this.resourceId}/changeIndex/${e.clone.id}`,
-        method: 'post',
-        data: {
-          [this.field.sortingField]: e.newIndex,
-        },
-        success: function(resources) {
-          $this.value = resources;
-
-          Nova.$toasted.success('Sorting saved successfully');
-        },
-        error: function(response) {
-          Nova.$toasted.error(`Error when saving sorting: ${response.responseJSON.message}`);
-        },
-      })
+      this.$http.post(
+        `/api/${this.field.mainApiResourceName}/${this.resourceId}/changeIndex/${e.clone.id}`,
+        {[this.field.sortingField]: e.newIndex}
+      ).then(response => {
+        this.value = response.data;
+        Nova.$toasted.success('Sorting saved successfully');
+      }).catch(error => Nova.$toasted.error(`Error when saving sorting: ${error.message}`));
     },
 
     editPivot(resource) {
@@ -202,35 +171,27 @@ export default {
     },
 
     confirmPivot() {
-      const $this = this;
       let newPivotValues = {};
       
       this.field.pivotFields.forEach(pivot => {
-        let el = $('#' + pivot.uniqueKey);
+        let el = document.querySelector(`#${pivot.uniqueKey}`);
 
-        if (this.pivotResource.pivot[pivot.attribute] != el.val()) {
-          newPivotValues[el.attr('data-name')] = el.val();
+        if (this.pivotResource.pivot[pivot.attribute] != el.value) {
+          newPivotValues[el.dataset.name] = el.value;
         }
       });   
 
       if (Object.keys(newPivotValues).length != 0) {
-        $.ajax({
-          url: `/api/${this.field.mainApiResourceName}/${this.resourceId}/updatePivot/${this.pivotResource.id}`,
-          method: 'post',
-          data: {
-            newValues: newPivotValues,
-          },
-          success: function(resources) {
-            if (newPivotValues[$this.field.sortingField] != undefined) {
-              $this.value = resources;
-            }
+        this.$http.post(
+          `/api/${this.field.mainApiResourceName}/${this.resourceId}/updatePivot/${this.pivotResource.id}`,
+          {newValues: newPivotValues}
+        ).then(response => {
+          if (newPivotValues[this.field.sortingField] != undefined) {
+            this.value = response.data;
+          }
 
-            Nova.$toasted.success('Pivot values saved successfully');
-          },
-          error: function(response) {
-            Nova.$toasted.error(`Error with saving pivot: ${response.responseJSON.message}`);
-          },
-        });
+          Nova.$toasted.success('Pivot values saved successfully');
+        }).catch(error => Nova.$toasted.error(`Error with saving pivot: ${error.message}`));
       }
 
       this.showPivotPopup = false;
