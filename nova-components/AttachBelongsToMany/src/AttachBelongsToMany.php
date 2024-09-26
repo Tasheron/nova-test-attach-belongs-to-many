@@ -23,11 +23,25 @@ class AttachBelongsToMany extends Field
             ->setNameField('name');
     }
 
-    public function apiResourceNames(string $resource, string $attachResource)
-    {
+    public function setResources(
+        string $mainResource,
+        string $attachResource,
+        string $belongsToManyFunction,
+        string $attachResourceFunction,
+        string $detachResourceFunction,
+        string $updatePivotFunction = 'updatePivot',
+        string $changeIndexFunction = 'changeIndex'
+    ) {
         return $this->withMeta([
-            'mainApiResourceName' => $resource,
-            'attachApiResourceName' => $attachResource,
+            'mainResource' => $mainResource,
+            'attachResource' => $attachResource,
+            'functionNames' => [
+                'btm' => $belongsToManyFunction,
+                'attach' => $attachResourceFunction,
+                'detach' => $detachResourceFunction,
+                'updatePivot' => $updatePivotFunction,
+                'changeIndex' => $changeIndexFunction,
+            ],
         ]);
     }
 

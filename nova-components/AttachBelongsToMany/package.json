@@ -22,7 +22,6 @@
   },
   "dependencies": {
     "feather-icons": "^4.29.2",
-    "vue-axios": "^3.5.2",
     "vue-draggable-next": "^2.2.1",
     "vue-feather": "^2.0.0",
     "vuedraggable": "^4.1.0",

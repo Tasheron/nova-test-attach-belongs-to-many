@@ -118,9 +118,10 @@ export default {
       let val = e.target.value;
 
       if (val != '') {
-        this.$http.post(
-          `/api/${this.field.attachApiResourceName}/find`,
+        Nova.request().post(
+          '/nova-vendor/attach-belongs-to-many/find',
           {
+            resource: this.field.attachResource,
             filter: val,
             resourceId: this.resourceId,
           }
@@ -132,8 +133,12 @@ export default {
     },
 
     detach(id) {
-      this.$http.delete(
-        `/api/${this.field.mainApiResourceName}/${this.resourceId}/${this.field.attachApiResourceName}/${id}`
+      Nova.request().post(
+        `/nova-vendor/attach-belongs-to-many/${this.resourceId}/detach/${id}`,
+        {
+          resource: this.field.mainResource,
+          detachFunction: this.field.functionNames.detach,
+        }
       ).then(() => {
         this.value = this.value.filter(el => el.id != id);
         Nova.$toasted.success('Model detach successfully');
@@ -141,8 +146,12 @@ export default {
     },
 
     attach(item) {
-      this.$http.put(
-        `/api/${this.field.mainApiResourceName}/${this.resourceId}/${this.field.attachApiResourceName}/${item.id}`
+      Nova.request().post(
+        `/nova-vendor/attach-belongs-to-many/${this.resourceId}/attach/${item.id}`,
+        {
+          resource: this.field.mainResource,
+          attachFunction: this.field.functionNames.attach,
+        }
       ).then(response => {
         this.findList = [];
         this.value.push(response.data);
@@ -156,9 +165,14 @@ export default {
         return;
       }
 
-      this.$http.post(
-        `/api/${this.field.mainApiResourceName}/${this.resourceId}/changeIndex/${e.clone.id}`,
-        {[this.field.sortingField]: e.newIndex}
+      Nova.request().post(
+        `/nova-vendor/attach-belongs-to-many/${this.resourceId}/changeIndex/${e.clone.id}`,
+        {
+          resource: this.field.mainResource,
+          btm: this.field.functionNames.btm,
+          indexFunction: this.field.functionNames.changeIndex,
+          index: e.newIndex,
+        }
       ).then(response => {
         this.value = response.data;
         Nova.$toasted.success('Sorting saved successfully');
@@ -172,24 +186,25 @@ export default {
 
     confirmPivot() {
       let newPivotValues = {};
-      
+
       this.field.pivotFields.forEach(pivot => {
         let el = document.querySelector(`#${pivot.uniqueKey}`);
 
         if (this.pivotResource.pivot[pivot.attribute] != el.value) {
           newPivotValues[el.dataset.name] = el.value;
         }
-      });   
+      });
 
       if (Object.keys(newPivotValues).length != 0) {
-        this.$http.post(
-          `/api/${this.field.mainApiResourceName}/${this.resourceId}/updatePivot/${this.pivotResource.id}`,
-          {newValues: newPivotValues}
-        ).then(response => {
-          if (newPivotValues[this.field.sortingField] != undefined) {
-            this.value = response.data;
+        Nova.request().post(
+          `/nova-vendor/attach-belongs-to-many/${this.resourceId}/updatePivot/${this.pivotResource.id}`,
+          {
+            resource: this.field.mainResource,
+            pivotFunction: this.field.functionNames.updatePivot,
+            newValues: newPivotValues,
           }
-
+        ).then(response => {
+          this.value = response.data;
           Nova.$toasted.success('Pivot values saved successfully');
         }).catch(error => Nova.$toasted.error(`Error with saving pivot: ${error.message}`));
       }

@@ -2,6 +2,8 @@
 
 namespace App\Nova;
 
+use App\Models\Category;
+use App\Models\Product as ModelsProduct;
 use Laravel\Nova\Fields\Currency;
 use Laravel\Nova\Fields\HasMany;
 use Laravel\Nova\Fields\ID;
@@ -67,10 +69,13 @@ class Product extends Resource
 
             Panel::make('Attach categories', [
                 AttachBelongsToMany::make('Categories')
-                    ->apiResourceNames('product', 'category')
-                    ->setSorting('index')
-                    ->setNameField('name')
-                    ->setPivotFields([
+                    ->setResources(
+                        ModelsProduct::class,
+                        Category::class,
+                        'categories',
+                        'addCategory',
+                        'removeCategory',
+                    )->setPivotFields([
                         Number::make('index'),
                     ]),
             ]),
